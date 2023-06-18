@@ -1,11 +1,10 @@
 import cp from 'node:child_process';
 
 const spawnChildProcess = async (args) => {
-  const child = cp.fork('./src/cp/files/script.js', args, {}, () => {
-    child.send('sadf');
-  });
-
+  const child = cp.fork('./src/cp/files/script.js', args);
+  child.on('error', (err) => {
+    console.log(err);
+  })
 };
 
-// Put your arguments in function call to test this functionality
-spawnChildProcess(['']);
+spawnChildProcess(['sadf', 'asdf', 221]);
