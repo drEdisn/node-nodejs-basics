@@ -8,7 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const compress = async () => {
   const gz = zlib.createGzip();
   const inp = fs.createReadStream(path.resolve(__dirname, 'files/fileToCompress.txt'));
-  const out = fs.createWriteStream(path.resolve(__dirname, 'files/archive.gz'), { encoding: 'utf-8' });
+  const out = fs.createWriteStream(path.resolve(__dirname, 'files/archive.gz'));
   inp.pipe(gz).pipe(out);
 };
 
