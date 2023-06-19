@@ -7,41 +7,30 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const performCalculations = async () => {
   const len = os.cpus().length;
-  const promises = [];
-  const results = [];
+  const workers = [];
   let count = 0;
 
-  process.stdin.on('data', async (buff) => {
-    const data = buff.toString();
+  for (let i = 0; i < len; i += 1) {
+    const worker = new Worker(
+      path.resolve(__dirname, 'worker.js'),
+      { stdin: true },
+    );
+    worker.on('message', (mess) => console.log(mess));
+    worker.on('error', () => console.error({
+      status: 'error',
+      data: null
+    }));
+    workers.push(worker);
+  }
+  console.log('Write numbers to calculate:\n');
+  process.stdin.on('data', async (s) => {
     if (count < len) {
-      const promise = new Promise((res, rej) => {
-        const worker = new Worker(
-          path.resolve(__dirname, 'worker.js'),
-          { workerData: data },
-        );
-        worker.on('message', (mess) => res(mess));
-        worker.on('error', (err) => rej(err));
-      });
-      promise.then((res) => {
-        results.push({
-          status: 'resolved',
-          data: res.res,
-          time: res.time,
-        });
-      }).catch(() => {
-        results.push({
-          status: 'error',
-          data: null
-        });
-      });
-      promises.push(promise);
+      console.log('Worker number: ', workers[count].threadId);
+      await workers[count].postMessage(s);
       count += 1;
-      if (count >= len) {
-        await Promise.allSettled(promises);
-        for (const i of results) {
-          console.log(i);
-        }
-        process.exit();
+
+      if (count === len) {
+        count = 0;
       }
     }
   });
