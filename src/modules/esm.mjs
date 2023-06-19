@@ -11,10 +11,14 @@ const random = Math.random();
 
 let unknownObject;
 
-const getJSONText = async (fileName) => await fs.readFile(
-  path.resolve(__dirname, `files/${fileName}.json`),
-  { encoding: 'utf-8' }
-);
+const getJSONText = async (fileName) => {
+  const res = await fs.readFile(
+    path.resolve(__dirname, `files/${fileName}.json`),
+    { encoding: 'utf-8' }
+  );
+  const data = JSON.parse(res);
+  return data;
+};
 
 if (random > 0.5) {
   unknownObject = await getJSONText('a');
