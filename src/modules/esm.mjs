@@ -1,9 +1,8 @@
 import path from 'node:path';
+import fs from 'node:fs/promises';
 import { fileURLToPath } from 'url';
 import { release, version } from 'node:os';
 import { createServer as createServerHttp } from 'node:http';
-import * as a from './files/a.json' assert { type: 'json' };
-import * as b from './files/b.json' assert { type: 'json' };
 import './files/c.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -12,10 +11,15 @@ const random = Math.random();
 
 let unknownObject;
 
+const getJSONText = async (fileName) => await fs.readFile(
+  path.resolve(__dirname, `files/${fileName}.json`),
+  { encoding: 'utf-8' }
+);
+
 if (random > 0.5) {
-  unknownObject = a;
+  unknownObject = await getJSONText('a');
 } else {
-  unknownObject = b;
+  unknownObject = await getJSONText('b');
 }
 
 console.log(`Release ${release()}`);
